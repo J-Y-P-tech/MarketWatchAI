@@ -1,6 +1,9 @@
-from django.core.management.base import BaseCommand
-from core.config import *
 import os
+from django.core.management.base import BaseCommand
+
+if not os.environ.get('GITHUB_ACTIONS'):
+    from core.config import *
+
 from yahoofinancials import YahooFinancials
 from ...models import Stock
 from datetime import datetime, timedelta, date

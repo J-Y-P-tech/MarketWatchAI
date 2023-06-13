@@ -1,0 +1,44 @@
+
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar {
+    background-color: #343a40;
+}
+
+.navbar-brand {
+    color: #fff;
+}
+
+.navbar-nav .nav-link {
+    color: #fff;
+    margin-left: 10px;
+}
+
+.hero {
+    background-position: center center;
+    background-size: cover;
+    height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    opacity: 1;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+.btn-primary {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.btn-primary:hover {
+    background-color: #138496;
+    border-color: #138496;
+}
