@@ -2,9 +2,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MarketWatchAI - Home</title>
+    <title>MarketWatchAI {% block title %} {% endblock %}</title>
     <!-- Add Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css">
+    <!-- Add Bootstrap icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+
     <!-- Add custom CSS -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
@@ -22,14 +25,17 @@
             <ul class="navbar-nav ml-auto">
                 {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Logout</a>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="nav-link btn btn-link">Logout</button>
+                    </form>
                 </li>
                 {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Login</a>
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Register</a>
+                    <a class="nav-link" href="{% url 'register' %}">Register</a>
                 </li>
                 {% endif %}
             </ul>
@@ -37,9 +43,10 @@
     </div>
 </nav>
 
-{% block content %}
-
-{% endblock %}
+<div class="content-wrapper">
+    {% block content %}
+    {% endblock %}
+</div>
 
  <!-- Footer Section -->
     <footer class="bg-dark text-white p-4 text-center">
