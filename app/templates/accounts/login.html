@@ -12,8 +12,9 @@
             <div class="col-lg-6">
                 <div class="login-card">
                     <div class="login-header">
-                        <h3>Sign into your account</h3>
+                        <h3>Login to your account</h3>
                     </div>
+                    {% include 'includes/messages.html' %}
                     <form action="{% url 'login' %}" method="POST">
                         {% csrf_token %}
                         <div class="form-group">

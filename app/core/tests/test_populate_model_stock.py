@@ -1,5 +1,5 @@
 import os
-from django.test import TestCase, SimpleTestCase
+from django.test import TestCase, SimpleTestCase, tag
 from core.management.commands.populate_model_stock import *
 from unittest.mock import patch, Mock, MagicMock
 from datetime import datetime, timedelta, date
@@ -9,6 +9,7 @@ from io import StringIO
 import sys
 
 
+@tag('github')
 class GetStockCodesTestCase(SimpleTestCase):
     """
     Test Class GetStockCodes.
@@ -66,6 +67,7 @@ class GetStockCodesTestCase(SimpleTestCase):
         os.remove('empty_file.txt')
 
 
+@tag('github')
 class TestFundTechAnalysis(SimpleTestCase):
     """
     Test Class for module FundTechAnalysis.
@@ -253,6 +255,7 @@ class TestFundTechAnalysis(SimpleTestCase):
         self.assertEqual(self.fta.five_year_avg_dividend_yield, 0.9)
 
 
+@tag('github')
 class TestPopulateUpdateStock(TestCase):
     """
     Tests for class PopulateUpdateStock.

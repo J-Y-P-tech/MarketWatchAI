@@ -112,6 +112,40 @@ class TestLogin(TestCase):
             # a successful login
             self.assertRedirects(response, reverse('home'))
 
+    def test_messages_successful_login(self):
+        """
+        Tests that when a user is logged in successfully the correct
+        message is generated
+        """
+        response = self.client.post(reverse('login'),
+                                    {'email': self.user.username,
+                                     'password': 'testpassword'},
+                                    follow=True)
+
+        # Confirm message 'You are now logged in.'
+        messages = list(response.context.get('messages'))
+        # 1 message generated
+        self.assertEqual(len(messages), 1)
+        # Confirm correct message
+        self.assertEqual(str(messages[0]), 'You are now logged in.')
+
+    def test_message_invalid_credentials(self):
+        """
+        Test thta when invalid credentials are provided the correct
+        message is generated.
+        """
+        response = self.client.post(reverse('login'),
+                                    {'email': self.user.username,
+                                     'password': 'wrongpassword'},
+                                    follow=True)
+
+        # Confirm message 'Invalid login credentials'
+        messages = list(response.context.get('messages'))
+        # 1 message generated
+        self.assertEqual(len(messages), 1)
+        # Confirm correct message
+        self.assertEqual(str(messages[0]), 'Invalid login credentials')
+
 
 class TestRegister(TestCase):
     """
@@ -209,6 +243,76 @@ class TestRegister(TestCase):
         # Confirm that no new user has been created
         user_exists = User.objects.filter(username='testuser@example.com').exists()
         self.assertFalse(user_exists)
+
+    def test_messages_successful_registration(self):
+        """
+        Tests that correct message has been displayed on successful registration
+        'Successful registration.'
+        """
+        # Make post request for user registration
+        response = self.client.post(reverse('register'),
+                                    {
+                                        'first_name': 'Test first name',
+                                        'last_name': 'Test last name',
+                                        'email': 'test_register@example.com',
+                                        'password': 'register_password',
+                                        'confirm_password': 'register_password'
+                                    }, follow=True)
+        # Confirm message 'Successful registration.'
+        messages = list(response.context.get('messages'))
+        # 1 message generated
+        self.assertEqual(len(messages), 1)
+        # Confirm correct message
+        self.assertEqual(str(messages[0]), 'Successful registration.')
+
+    def test_messages_existing_email(self):
+        """
+        Test correct message generated when trying to register with
+        existing email: 'This email already exists. Try another one.'
+        """
+        self.client = Client()
+        self.user = User.objects.create_user(first_name="Test First Name",
+                                             last_name="Test Last Name",
+                                             email='test_existing@example.com',
+                                             username='test_existing@example.com',
+                                             password='test_password')
+
+        # Make post request for user registration
+        response = self.client.post(reverse('register'),
+                                    {
+                                        'first_name': 'Test first name',
+                                        'last_name': 'Test last name',
+                                        'email': 'test_existing@example.com',
+                                        'password': 'register_password',
+                                        'confirm_password': 'register_password'
+                                    }, follow=True)
+        # Confirm message 'This email already exists. Try another one.'
+        messages = list(response.context.get('messages'))
+        # 1 message generated
+        self.assertEqual(len(messages), 1)
+        # Confirm correct message
+        self.assertEqual(str(messages[0]), 'This email already exists. Try another one.')
+
+    def test_messages_password_missmatch(self):
+        """
+        Test when password missmatch a correct message is generated:
+        'Password missmatch.'
+        """
+        # Make post request for user registration
+        response = self.client.post(reverse('register'),
+                                    {
+                                        'first_name': 'Test first name',
+                                        'last_name': 'Test last name',
+                                        'email': 'testuser@example.com',
+                                        'password': 'register_password',
+                                        'confirm_password': 'wrong_password'
+                                    }, follow=True)
+        # Confirm message 'Password missmatch.'
+        messages = list(response.context.get('messages'))
+        # 1 message generated
+        self.assertEqual(len(messages), 1)
+        # Confirm correct message
+        self.assertEqual(str(messages[0]), 'Password missmatch.')
 
 
 class TestLogout(TestCase):

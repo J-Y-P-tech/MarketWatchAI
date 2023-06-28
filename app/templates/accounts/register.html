@@ -14,6 +14,7 @@
                     <div class="login-header">
                         <h3>Register</h3>
                     </div>
+                    {% include 'includes/messages.html' %}
                     <form action="{% url 'register' %}" method="POST">
                         {% csrf_token %}
                         <div class="form-group">

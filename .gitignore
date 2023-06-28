@@ -1,5 +1,6 @@
 # Ignore instrucitons data
 *.docx
+*.tmp
 
 # Ignore created by PyCharm folder
 .idea/

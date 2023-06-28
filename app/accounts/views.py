@@ -20,10 +20,10 @@ def login(request):
 
         if user is not None:
             auth.login(request, user)
-            # messages.success(request, 'You are now logged in.')
+            messages.success(request, 'You are now logged in.')
             return redirect('home')
         else:
-            # messages.error(request, 'Invalid login credentials')
+            messages.error(request, 'Invalid login credentials')
             return redirect('login')
 
     return render(request, 'accounts/login.html')
@@ -43,6 +43,8 @@ def register(request):
 
         if password == confirm_password:
             if User.objects.filter(email=email).exists():
+                # Email exists
+                messages.error(request, 'This email already exists. Try another one.')
                 return redirect('register')
             else:
                 user = User.objects.create_user(first_name=first_name, last_name=last_name,
@@ -51,11 +53,12 @@ def register(request):
                 user.save()
                 # Automatically log in registered user
                 auth.login(request, user)
-
+                messages.success(request, 'Successful registration.')
                 return redirect('home')
 
         else:
             # Password missmatch
+            messages.error(request, 'Password missmatch.')
             return redirect('register')
     else:
         # Method is not POST
