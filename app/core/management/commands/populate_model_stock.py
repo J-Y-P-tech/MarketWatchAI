@@ -1,8 +1,12 @@
 import os
 from django.core.management.base import BaseCommand
 
-if not os.environ.get('GITHUB_ACTIONS'):
+# core.config will not be uploaded to GitHub for security purposes
+# This should not affect the tests
+try:
     from core.config import *
+except:
+    pass
 
 from yahoofinancials import YahooFinancials
 from ...models import Stock
