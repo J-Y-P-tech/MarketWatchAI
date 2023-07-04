@@ -162,3 +162,12 @@ body {
   .text-center a:hover {
     text-decoration: underline;
   }
+
+
+  .small-font {
+        font-size: 12px;
+  }
+  .bg-light-grey {
+        background-color: #f2f2f2;
+  }
+

@@ -35,6 +35,11 @@ INSTALLED_APPS = [
     'pages',
     'accounts',
 
+    # Rest
+    'rest_framework',
+    'drf_spectacular',
+    'rest_framework.authtoken',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -137,4 +142,7 @@ from django.contrib.messages import constants as messages
 
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
+}
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }

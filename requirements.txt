@@ -5,3 +5,4 @@ pandas>=1.3.4,<1.4
 requests>=2.26.0,<2.27
 ta>=0.7.0,<0.8
 yahoofinancials==1.14
+drf-spectacular>=0.15.1,<0.16
