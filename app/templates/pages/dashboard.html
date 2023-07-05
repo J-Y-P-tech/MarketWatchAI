@@ -2,24 +2,26 @@
 {% load static %}
 {% block content %}
 
-<form class="container col-9 mt-4">
+<form class="container col-9 mt-4" method="POST">
+    {% csrf_token %}
     <div class="form-group row border border-secondary">
         <div class="col-sm-6">
             <div class="range-slider">
-                <label for="fa-score" class="col-form-label text-center">
+                <label for="fa_score" class="col-form-label text-center">
                     <i class="bi bi-graph-up m-2"></i> minimum <strong>FA Score:</strong>
                 </label>
-                <output id="fa-score-value" class="range-value">30</output>
-                <input type="range" class="form-range" id="fa-score" min="0" max="33" value="30"
-                       oninput="document.getElementById('fa-score-value').innerHTML = this.value;">
+                <output id="fa_score-value" class="range-value">{{ fa_score }}</output>
+                <input type="range" class="form-range" id="fa_score" name='fa_score' min="0" max="33"
+                       value="{{ fa_score }}"
+                       oninput="document.getElementById('fa_score-value').innerHTML = this.value;">
             </div>
         </div>
         <div class="col-sm-6">
             <div class="range-slider">
                 <label for="rsi" class="col-form-label text-center"><i class="bi bi-speedometer2 m-2"></i>
                     maximum <strong>RSI:</strong> </label>
-                <output id="rsi-value" class="range-value">40</output>
-                <input type="range" class="form-range" id="rsi" min="0" max="100" value="40"
+                <output id="rsi-value" class="range-value">{{ rsi }}</output>
+                <input type="range" class="form-range" id="rsi" name='rsi' min="0" max="100" value="{{ rsi }}"
                        oninput="document.getElementById('rsi-value').innerHTML = this.value;">
             </div>
         </div>
@@ -27,25 +29,30 @@
     <div class="form-group row border border-secondary mt-1">
         <div class="col-sm-6">
             <div class="range-slider">
-                <label for="avg-gain-loss" class="col-form-label text-center">
+                <label for="avg_gain_loss" class="col-form-label text-center">
                     <i class="bi bi-bar-chart-line m-2"></i> minimum <strong>Avg
                     Gain Loss: </strong></label>
-                <output id="avg-gain-loss-value" class="range-value">10</output>
-                <input type="range" class="form-range" id="avg-gain-loss" min="0" max="50" value="10"
-                       oninput="document.getElementById('avg-gain-loss-value').innerHTML = this.value;">
+                <output id="avg_gain_loss-value" class="range-value">{{ avg_gain_loss }}</output>
+                <input type="range" class="form-range" id="avg_gain_loss" name='avg_gain_loss' min="0" max="50"
+                       value="{{ avg_gain_loss }}"
+                       oninput="document.getElementById('avg_gain_loss-value').innerHTML = this.value;">
             </div>
         </div>
         <div class="col-sm-6">
             <div class="range-slider">
-                <label for="five-year-dividend-yield" class="col-form-label text-center"><i
+                <label for="five_year_avg_dividend_yield" class="col-form-label text-center"><i
                         class="bi bi-cash-stack m-2"></i> minimum <strong>Five Year Avg Dividend Yield:</strong>
                 </label>
-                <output id="five-year-dividend-yield-value" class="range-value">2</output>
-                <input type="range" class="form-range" id="five-year-dividend-yield" min="0" max="10" value="2"
-                       oninput="document.getElementById('five-year-dividend-yield-value').innerHTML = this.value;">
+                <output id="five_year_avg_dividend_yield-value" class="range-value">{{ five_year_avg_dividend_yield }}
+                </output>
+                <input type="range" class="form-range" id="five_year_avg_dividend_yield"
+                       name="five_year_avg_dividend_yield"
+                       min="0" max="10" value="{{ five_year_avg_dividend_yield }}"
+                       oninput="document.getElementById('five_year_avg_dividend_yield-value').innerHTML = this.value;">
 
             </div>
         </div>
+
     </div>
 
     <div class="row justify-content-center">
@@ -58,136 +65,100 @@
 
 </form>
 
+{% if all_stocks %}
 <div class="container col-10 mt-5">
     <div class="table-responsive">
-        <table class="container table table-hover">
-            <thead>
-            <tr>
-                <th class="small-font table-secondary">Stock Code</th>
-                <th class="small-font table-secondary">Sector</th>
-                <th class="small-font table-secondary">Industry</th>
-                <th class="small-font table-secondary">Country</th>
-                <th class="small-font table-secondary">Exchange</th>
-                <th class="small-font table-secondary">Company Name</th>
-                <th class="small-font table-secondary">RSI</th>
-                <th class="small-font table-secondary">FA Score</th>
-                <th class="small-font table-secondary">Avg Gain Loss</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>ABC</td>
-                <td>Technology</td>
-                <td>Software</td>
-                <td>USA</td>
-                <td>NASDAQ</td>
-                <td>ABC Corp</td>
-                <td>45</td>
-                <td>32</td>
-                <td>12</td>
-            </tr>
-            <tr>
-                <td>DEF</td>
-                <td>Healthcare</td>
-                <td>Pharmaceuticals</td>
-                <td>Canada</td>
-                <td>Toronto Stock Exchange</td>
-                <td>DEF Inc</td>
-                <td>60</td>
-                <td>28</td>
-                <td>8</td>
-            </tr>
-            <tr>
-                <td>GHI</td>
-                <td>Consumer Goods</td>
-                <td>Apparel</td>
-                <td>France</td>
-                <td>Euronext Paris</td>
-                <td>GHI SA</td>
-                <td>35</td>
-                <td>29</td>
-                <td>15</td>
-            </tr>
-            <tr>
-                <td>JKL</td>
-                <td>Energy</td>
-                <td>Oil & Gas</td>
-                <td>USA</td>
-                <td>New York Stock Exchange</td>
-                <td>JKL Corp</td>
-                <td>50</td>
-                <td>30</td>
-                <td>11</td>
-            </tr>
-            <tr>
-                <td>MNO</td>
-                <td>Financials</td>
-                <td>Banking</td>
-                <td>UK</td>
-                <td>London Stock Exchange</td>
-                <td>MNO Bank</td>
-                <td>55</td>
-                <td>31</td>
-                <td>13</td>
-            </tr>
-            <tr>
-                <td>PQR</td>
-                <td>Technology</td>
-                <td>Hardware</td>
-                <td>USA</td>
-                <td>NASDAQ</td>
-                <td>PQR Inc</td>
-                <td>40</td>
-                <td>33</td>
-                <td>14</td>
-            </tr>
-            <tr>
-                <td>STU</td>
-                <td>Consumer Goods</td>
-                <td>Beverages</td>
-                <td>Germany</td>
-                <td>Frankfurt Stock Exchange</td>
-                <td>STU AG</td>
-                <td>30</td>
-                <td>30</td>
-                <td>9</td>
-            </tr>
-            <tr>
-                <td>VWX</td>
-                <td>Industrials</td>
-                <td>Aerospace</td>
-                <td>USA</td>
-                <td>New York Stock Exchange</td>
-                <td>VWX Corp</td>
-                <td>65</td>
-                <td>27</td>
-                <td>7</td>
-            </tr>
-            <tr>
-                <td>YZA</td>
-                <td>Healthcare</td>
-                <td>Medical Devices</td>
-                <td>USA</td>
-                <td>NASDAQ</td>
-                <td>YZA Inc</td>
-                <td>70</td>
-                <td>26</td>
-                <td>10</td>
-            </tr>
-            <tr>
-                <td>BCD</td>
-                <td>Utilities</td>
-                <td>Electricity</td>
-                <td>Canada</td>
-                <td>Toronto Stock Exchange</td>
-                <td>BCD Corp</td>
-                <td>25</td>
-                <td>31</td>
-                <td>16</td>
-            </tr>
-            </tbody>
-        </table>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="fa_score" value="{{ fa_score }}">
+            <input type="hidden" name="rsi" value="{{ rsi }}">
+            <input type="hidden" name="avg_gain_loss" value="{{ avg_gain_loss }}">
+            <input type="hidden" name="five_year_avg_dividend_yield" value="{{ five_year_avg_dividend_yield }}">
+
+            <table class="container table table-hover">
+                <thead>
+                <tr>
+                    <th class="small-font table-secondary">
+                        <button type="submit" name="sort" value="stock_code" class="btn btn-link">
+                            Stock Code
+                        </button>
+                    </th>
+                    <th class="small-font table-secondary">
+                        <button type="submit" name="sort" value="sector" class="btn btn-link">
+                            Sector
+                        </button>
+                    </th>
+                    <th class="small-font table-secondary">
+                        <button type="submit" name="sort" value="industry" class="btn btn-link">
+                            Industry
+                        </button>
+                    </th>
+                    <th class="small-font table-secondary">
+                        <button type="submit" name="sort" value="country" class="btn btn-link">
+                            Country
+                        </button>
+                    </th>
+                    <th class="small-font table-secondary">
+                        <button type="submit" name="sort" value="exchange_short_name"
+                                class="btn btn-link">
+                            Exchange
+                        </button>
+                    </th>
+                    <th class="small-font table-secondary">
+                        <button type="submit" name="sort" value="company_name" class="btn btn-link">
+                            Company Name
+                        </button>
+                    </th>
+                    <th class="small-font table-secondary">
+                        <button type="submit" name="sort" value="rsi" class="btn btn-link">
+                            RSI
+                        </button>
+                    </th>
+                    <th class="small-font table-secondary">
+                        <button type="submit" name="sort" value="fa_score" class="btn btn-link">
+                            FA Score
+                        </button>
+                    </th>
+                    <th class="small-font table-secondary">
+                        <button type="submit" name="sort" value="avg_gain_loss" class="btn btn-link">
+                            Avg Gain Loss
+                        </button>
+                    </th>
+                    <th class="small-font table-secondary">
+                        <button type="submit" name="sort" value="five_year_avg_dividend_yield"
+                                class="btn btn-link">
+                            Five year avg dividend yield
+                        </button>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for stock in all_stocks %}
+                <tr>
+                    <td>{{ stock.stock_code }}</td>
+                    <td>{{ stock.sector }}</td>
+                    <td>{{ stock.industry }}</td>
+                    <td>{{ stock.country }}</td>
+                    <td>{{ stock.exchange_short_name }}</td>
+                    <td>{{stock.company_name }}</td>
+                    <td>{{ stock.rsi }}</td>
+                    <td>{{ stock.fa_score }}</td>
+                    <td>{{ stock.avg_gain_loss}}</td>
+                    <td>{{ stock.five_year_avg_dividend_yield}}</td>
+                </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </form>
     </div>
 </div>
+
+{% else %}
+<div class="container text-center text-secondary mt-5">
+    <h1>No data to display</h1>
+    <h3>Update the search and try again</h3>
+</div>
+{% endif %}
 
 {% endblock %}
