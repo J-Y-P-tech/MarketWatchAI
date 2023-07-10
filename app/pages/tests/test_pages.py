@@ -34,6 +34,6 @@ class PublicTests(SimpleTestCase):
 
         # Optionally, you can also assert the content of the response
         # to check for expected HTML
-        self.assertContains(response, '<!-- Navbar Section -->')
+        self.assertContains(response, '<!-- Hero Section -->')
         self.assertContains(response, '<!-- Footer Section -->')
 

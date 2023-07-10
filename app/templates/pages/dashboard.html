@@ -8,7 +8,7 @@
         <div class="col-sm-6">
             <div class="range-slider">
                 <label for="fa_score" class="col-form-label text-center">
-                    <i class="bi bi-graph-up m-2"></i> minimum <strong>FA Score:</strong>
+                    minimum <strong>FA Score:</strong>
                 </label>
                 <output id="fa_score-value" class="range-value">{{ fa_score }}</output>
                 <input type="range" class="form-range" id="fa_score" name='fa_score' min="0" max="33"
@@ -18,7 +18,7 @@
         </div>
         <div class="col-sm-6">
             <div class="range-slider">
-                <label for="rsi" class="col-form-label text-center"><i class="bi bi-speedometer2 m-2"></i>
+                <label for="rsi" class="col-form-label text-center">
                     maximum <strong>RSI:</strong> </label>
                 <output id="rsi-value" class="range-value">{{ rsi }}</output>
                 <input type="range" class="form-range" id="rsi" name='rsi' min="0" max="100" value="{{ rsi }}"
@@ -30,7 +30,7 @@
         <div class="col-sm-6">
             <div class="range-slider">
                 <label for="avg_gain_loss" class="col-form-label text-center">
-                    <i class="bi bi-bar-chart-line m-2"></i> minimum <strong>Avg
+                    minimum <strong>Avg
                     Gain Loss: </strong></label>
                 <output id="avg_gain_loss-value" class="range-value">{{ avg_gain_loss }}</output>
                 <input type="range" class="form-range" id="avg_gain_loss" name='avg_gain_loss' min="0" max="50"
@@ -40,8 +40,8 @@
         </div>
         <div class="col-sm-6">
             <div class="range-slider">
-                <label for="five_year_avg_dividend_yield" class="col-form-label text-center"><i
-                        class="bi bi-cash-stack m-2"></i> minimum <strong>Five Year Avg Dividend Yield:</strong>
+                <label for="five_year_avg_dividend_yield" class="col-form-label text-center">
+                    minimum <strong>5 Year Avg Dividend Yield:</strong>
                 </label>
                 <output id="five_year_avg_dividend_yield-value" class="range-value">{{ five_year_avg_dividend_yield }}
                 </output>
@@ -57,7 +57,7 @@
 
     <div class="row justify-content-center">
         <div class="form-group mt-3 col-3">
-            <button type="submit" class="btn btn-secondary btn-lg rounded">
+            <button type="submit" class="btn btn-secondary btn-lg rounded shadow-sm">
                 <i class="bi bi-funnel-fill"></i> Filter Data
             </button>
         </div>
@@ -135,7 +135,7 @@
                 <tbody>
                 {% for stock in all_stocks %}
                 <tr>
-                    <td>{{ stock.stock_code }}</td>
+                    <td><a href="{% url 'detail' stock.id %}" style="text-decoration:none;color:black;">{{ stock.stock_code }}</a></td>
                     <td>{{ stock.sector }}</td>
                     <td>{{ stock.industry }}</td>
                     <td>{{ stock.country }}</td>

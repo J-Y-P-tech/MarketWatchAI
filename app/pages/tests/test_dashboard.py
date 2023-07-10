@@ -1,6 +1,5 @@
 from django.urls import reverse
-from django.test import SimpleTestCase, TestCase, Client
-from django.contrib.auth.models import User
+from django.test import TestCase, Client
 from core.models import Stock
 from decimal import Decimal
 from bs4 import BeautifulSoup
@@ -119,7 +118,7 @@ class TestDashboardFilter(TestCase):
         # Login registered user
         self.client.login(username='1@example.com', password='1111')
 
-        Stock.objects.create(
+        self.stock = Stock.objects.create(
             stock_code='ABC',
             sector='Technology',
             industry='Software',
@@ -234,6 +233,27 @@ class TestDashboardFilter(TestCase):
         # Confirm that company 'ABC' is part of the result and 'XYZ' is not
         self.assertContains(response, 'ABC')
         self.assertNotContains(response, 'XYZ')
+
+    def test_dashboard_url(self):
+        """
+        Test that stock_code from the results is url to detail page
+        """
+        # Generate Search with default values
+        data = {
+            'fa_score': 29,
+            'rsi': 40,
+            'avg_gain_loss': 4,
+            'five_year_avg_dividend_yield': 1
+        }
+        # send a post request to the form view with the data
+        response = self.client.post(reverse('dashboard'), data)
+        # assert that the response status code is 200 (OK)
+        self.assertEqual(response.status_code, 200)
+
+        soup = BeautifulSoup(response.content, "html.parser")
+        links = soup.find_all("a", style="text-decoration:none;color:black;")
+
+        self.assertEqual(links[0]["href"], '/' + str(self.stock.id))
 
 
 class TestDashboardSort(TestCase):

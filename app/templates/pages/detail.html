@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<section class="bg-light">
+    <div class="container col-sm-10 my-4">
+
+        <div class="card border-danger shadow">
+            <div class="card-header bg-danger"></div>
+
+            <div class="row align-items-center p-4">
+
+                <div class="col-8">
+                    <span class="display-6" id="company_name">{{ stock.company_name }}</span>
+                </div>
+                <div class="col-4 ps-5">
+                    <div class="text-end">
+                        <a href="https://finance.yahoo.com/quote/{{ stock.stock_code }}"
+                           style="text-decoration:none; color: red;"
+                           target="_blank"
+                           id="stock_code">{{ stock.stock_code }}</a><br>
+
+                        <span class="c-fs-6 text-secondary" id="exchange_short_name">
+                            exchange: {{ stock.exchange_short_name }}</span>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col">
+                        <span class="c-fs-6 text-secondary">Sector:</span>
+                        <span class="c-fs-6" id="sector">{{ stock.sector }}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <span class="c-fs-6 text-secondary">Industry:</span>
+                        <span class="c-fs-6" id="industry">{{ stock.industry }}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <span class="c-fs-6 text-secondary">Country:</span>
+                        <span class="c-fs-6" id="country">{{ stock.country }}</span>
+                    </div>
+                </div>
+
+
+                <div class="accordion my-3" id="accordionPanelsStayOpenExample">
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="panelsStayOpen-headingZero">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#panelsStayOpen-collapseZero" aria-expanded="true"
+                                    aria-controls="panelsStayOpen-collapseZero">
+                                Business
+                            </button>
+                        </h2>
+                        <div id="panelsStayOpen-collapseZero"
+                             class="accordion-collapse collapse show"
+                             aria-labelledby="panelsStayOpen-headingZero">
+                            <div class="accordion-body">
+                                <p class="c-fs-6" id="description">
+                                    {{ stock.description }}
+                                <p>
+                                    {% if stock.ipo_years == 1 %}
+                                    <code id="ipo_years">{{ stock.company_name }} is on the stock market more than 1 year.</code>
+                                    {% elif stock.ipo_years > 1 %}
+                                    <code id="ipo_years">{{ stock.company_name }} is on the stock market more than {{ stock.ipo_years }} years.</code>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="accordion-item">
+
+                        <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                            <button class="accordion-button collapsed" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="false"
+                                    aria-controls="panelsStayOpen-collapseOne"
+                                    id="fa_score">
+                                FA score: {{ stock.fa_score }}
+                            </button>
+                        </h2>
+                        <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse"
+                             aria-labelledby="panelsStayOpen-headingOne">
+                            <div class="accordion-body">
+                                <p>
+                                    <strong>Fundamental analysis</strong> is a method of evaluating the intrinsic
+                                    value of a stock or security
+                                    by examining related economic and financial factors. It uses publicly available
+                                    financial data to assess the value of an
+                                    investment and identify opportunities. It combines financial statements,
+                                    external influences, events, and industry trends
+                                    to analyze a company's actual worth and make financial forecasts.
+                                </p>
+                                <p><code>Fundamental anaysis score above 30 is considered to be good for
+                                    long term investment.</code></p>
+                                <p class="pt-2 c-fs-6 text-secondary">
+                                    Average FA score for this Sector is 27<br>
+                                    Average FA score for this Industry is 28
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+                            <button class="accordion-button collapsed" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false"
+                                    aria-controls="panelsStayOpen-collapseTwo"
+                            id="rsi">
+                                RSI: {{ stock.rsi }}
+                            </button>
+                        </h2>
+                        <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse"
+                             aria-labelledby="panelsStayOpen-headingTwo">
+                            <div class="accordion-body">
+                                <p>
+                                    <strong>RSI</strong> (Relative Strength Index) is a widely used indicator in
+                                    financial
+                                    markets to assess the strength and momentum of a price trend.
+                                    It helps traders identify potential buying or selling opportunities
+                                    based on overbought or oversold conditions. RSI values above 70 suggest
+                                    overbought levels, while values below 30 indicate oversold levels.</p>
+                                <p><code>Current RSI is calculated on weekly base and is suitable for long term
+                                    investment strategies.
+                                </code></p>
+                                <p class="pt-2 c-fs-6 text-secondary">
+                                    Average RSI for this Sector is 51<br>
+                                    Average RSI score for this Industry is 53
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="panelsStayOpen-headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false"
+                                    aria-controls="panelsStayOpen-collapseThree"
+                            id="avg_gain_loss">
+                                Average gain/loss: +{{ stock.avg_gain_loss }}
+                            </button>
+                        </h2>
+                        <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse"
+                             aria-labelledby="panelsStayOpen-headingThree">
+                            <div class="accordion-body">
+                                <p>This indicator gives percentage that the stock gained or lost
+                                    for the past 5 years on average base per year.</p>
+                                <p><code>Average gain/loss of +10 or more is considered very good for long term
+                                    investment.
+                                </code></p>
+                                <p class="pt-2 c-fs-6 text-secondary">
+                                    Average gain/loss for this Sector is +7<br>
+                                    Average gain/loss score for this Industry is +11
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="panelsStayOpen-headingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="false"
+                                    aria-controls="panelsStayOpen-collapseFour"
+                            id="five_year_avg_dividend_yield">
+                                5-Year Avg Dividend Yield: {{ stock.five_year_avg_dividend_yield }}
+                            </button>
+                        </h2>
+                        <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse"
+                             aria-labelledby="panelsStayOpen-headingThree">
+                            <div class="accordion-body">
+                                <p>This indicator give percentage that the stock returned as dividends for the past
+                                    5 years
+                                    on average base per year.</p>
+                                <p><code>5-Year Avg Dividend Yield of 2 or more is considered good for long term
+                                    investment.
+                                </code></p>
+                                <p class="pt-2 c-fs-6 text-secondary">
+                                    Average 5-Year Dividend Yield for this Sector is +0.7<br>
+                                    Average 5-Year Dividend Yield for this Industry is +0.88
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+</section>
+
+<div class="my-5"></div>
+
+
+{% endblock %}

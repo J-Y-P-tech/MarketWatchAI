@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from core.models import Stock
@@ -113,3 +113,18 @@ def dashboard(request):
         }
 
         return render(request, 'pages/dashboard.html', data)
+
+
+@login_required(login_url='/accounts/login')
+def detail(request, id):
+    """
+    View for stock detail. By given stock id, checks if
+    it is present in model Stock and returns its data to the
+    template.
+    """
+    stock = get_object_or_404(Stock, pk=id)
+    data = {
+        'stock': stock,
+    }
+
+    return render(request, 'pages/detail.html', data)

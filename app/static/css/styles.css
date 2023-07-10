@@ -182,3 +182,49 @@ body {
   text-decoration: none;
 }
 
+.c-fs-6 {
+            font-size: 14px;
+        }
+
+        .c-lh {
+            line-height: 14px;
+        }
+         /* Custom slider styles */
+        .form-range {
+            --slider-bg-color: #cac9c9; /* Set the background color of the slider track */
+            --slider-fill-color: #0d6efd; /* Set the fill color of the slider track up to the thumb */
+            --slider-thumb-color: #0d6efd; /* Set the color of the slider thumb */
+        }
+
+        .form-range::-webkit-slider-runnable-track {
+            background-color: var(--slider-bg-color);
+        }
+
+        .form-range::-webkit-slider-thumb {
+            background-color: var(--slider-thumb-color);
+        }
+
+        .form-range::-moz-range-track {
+            background-color: var(--slider-bg-color);
+        }
+
+        .form-range::-moz-range-thumb {
+            background-color: var(--slider-thumb-color);
+        }
+
+        .form-range::-ms-track {
+            background-color: var(--slider-bg-color);
+        }
+
+        .form-range::-ms-fill-lower {
+            background-color: var(--slider-fill-color);
+        }
+
+        .form-range::-ms-thumb {
+            background-color: var(--slider-thumb-color);
+        }
+
+        .c-bg-dark
+        {
+            background-color: #343a40;
+        }
