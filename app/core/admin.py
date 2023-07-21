@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Stock
+from .management.commands.populate_model_stock import Command
 
 
 class StockAdmin(admin.ModelAdmin):
@@ -7,6 +8,7 @@ class StockAdmin(admin.ModelAdmin):
     This class defines what fields to be displayed in admin panel,
     which of them to be displayed as links and filters
     """
+    actions = ['populate_model_stock']
     search_fields = list_display = (
         'stock_code',
         'sector',
@@ -42,6 +44,10 @@ class StockAdmin(admin.ModelAdmin):
         'ipo_years', 'rsi', 'rsi_date', 'fa_score', 'fa_score_date',
         'avg_gain_loss', 'five_year_avg_dividend_yield', 'description'
     )
+
+    def populate_model_stock(self, request, queryset):
+        # Call the command logic here
+        Command().handle(queryset=queryset)
 
 
 admin.site.register(Stock, StockAdmin)

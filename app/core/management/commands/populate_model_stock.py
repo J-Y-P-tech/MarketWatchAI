@@ -25,15 +25,31 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
+        """
+        Update selected stocks from admin panel.
+        Add new stocks from txt file if any.
+        """
+
+        # Get the queryset from the options dictionary
+        queryset = options.get('queryset')
+        # Loop over the selected objects
+        for stock in queryset:
+            # Get the stock code from the object
+            stock_code = stock.stock_code
+            pus = PopulateUpdateStock(stock_code=stock_code)
+            pus.populate_company_info(update=False)
+            pus.populate_fundamental_analysis_score(update=True)
+            pus.populate_rsi(update=True)
+            pus.populate_avg_gain_loss(update=True)
+            pus.populate_five_year_avg_dividend_yield(update=True)
+
         gsc = GetStockCodes(txt_file='all_stock_codes.txt')
         gsc.get_stock_codes_from_txt()
         for stock_code in gsc.list_codes:
-            pus = PopulateUpdateStock(stock_code=stock_code)
-            pus.populate_company_info(update=False)
-            pus.populate_fundamental_analysis_score(update=False)
-            pus.populate_rsi(update=False)
-            pus.populate_avg_gain_loss(update=False)
-            pus.populate_five_year_avg_dividend_yield(update=False)
+            # Check if the stock code already exists in the database
+            if not Stock.objects.filter(stock_code=stock_code).exists():
+                pus = PopulateUpdateStock(stock_code=stock_code)
+                pus.populate_company_info(update=False)
 
 
 class GetStockCodes:
@@ -306,6 +322,7 @@ class PopulateUpdateStock:
         """
         all_stocks_model = Stock.objects.all()
         stock = all_stocks_model.filter(stock_code=self.stock_code).first()
+        # stock = all_stocks_model.get(stock_code=self.stock_code)
         # Company does not exist in model Stock create new object.
         if not stock:
             stock = Stock.objects.create(

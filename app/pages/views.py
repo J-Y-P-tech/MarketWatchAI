@@ -1,8 +1,11 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 from core.models import Stock
 import decimal
+from rest_framework import viewsets
+from .serializers import StockSerializer
+from rest_framework.exceptions import ParseError
+from rest_framework.permissions import IsAuthenticated
 
 
 def home(request):
@@ -128,3 +131,41 @@ def detail(request, id):
     }
 
     return render(request, 'pages/detail.html', data)
+
+
+class StockListAPIView(viewsets.ReadOnlyModelViewSet):
+    """
+    API list View that will get:
+    fa_score, rsi, avg_gain_loss, five_year_avg_dividend_yield
+    from request. All indicators should be present.
+    If they are not present an Exception will be raised.
+    To test this API open
+    http://localhost:8000/dashboard-api/?fa_score=30&rsi=40&avg_gain_loss=10&five_year_avg_dividend_yield=1
+    """
+    queryset = Stock.objects.all()
+    serializer_class = StockSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        fa_score = self.request.query_params.get('fa_score')
+        rsi = self.request.query_params.get('rsi')
+        avg_gain_loss = self.request.query_params.get('avg_gain_loss')
+        five_year_avg_dividend_yield = self.request.query_params.get('five_year_avg_dividend_yield')
+
+        # If any of the parameters are missing, return an empty queryset
+        if not (fa_score and rsi and avg_gain_loss and five_year_avg_dividend_yield):
+            raise ParseError("All required indicators (fa_score, rsi, avg_gain_loss, "
+                             "five_year_avg_dividend_yield) must be provided.")
+
+        # Apply filters
+        if fa_score:
+            queryset = queryset.filter(fa_score__gt=int(fa_score))
+        if rsi:
+            queryset = queryset.filter(rsi__lte=int(rsi))
+        if avg_gain_loss:
+            queryset = queryset.filter(avg_gain_loss__gt=float(avg_gain_loss))
+        if five_year_avg_dividend_yield:
+            queryset = queryset.filter(five_year_avg_dividend_yield__gt=float(five_year_avg_dividend_yield))
+
+        return queryset

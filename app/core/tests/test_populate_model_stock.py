@@ -5,6 +5,7 @@ from unittest.mock import patch, Mock, MagicMock
 from datetime import datetime, timedelta, date
 from core.tests.data_for_testing_populate_model_stock import *
 from core.models import Stock
+from django.contrib.auth.models import User
 from io import StringIO
 import sys
 
@@ -647,3 +648,83 @@ class TestPopulateUpdateStock(TestCase):
         sys.stdout = old_stdout
         # Assert that the output contains the expected string
         self.assertIn("populate_five_year_avg_dividend_yield Exception:", output)
+
+
+class TestAdminUpdateStocks(TestCase):
+    """
+    Test Update Stock data on admin interface
+    """
+
+    def setUp(self):
+        # Create a superuser for admin access
+        self.admin_user = User.objects.create_superuser(
+            username='testsuperuser@example.com',
+            email='testsuperuser@example.com',
+            password='admin123'
+        )
+
+        # Create some initial stocks in the database
+        Stock.objects.create(stock_code='AAPL')
+        Stock.objects.create(stock_code='GOOG')
+        Stock.objects.create(stock_code='MSFT')
+
+    @patch('core.management.commands.populate_model_stock.FundTechAnalysis')
+    def test_populate_existing_stocks(self, mock_fta):
+        # Create a mock instance of FundTechAnalysis
+        mock_fta_instance = mock_fta.return_value
+
+        # set some values for its attributes
+        mock_fta_instance.description = 'company description'
+        mock_fta_instance.sector = 'sector'
+        mock_fta_instance.industry = 'industry'
+        mock_fta_instance.country = 'US'
+        mock_fta_instance.exchange_short_name = 'exc'
+        mock_fta_instance.company_name = 'company name'
+        mock_fta_instance.ipo_years = 10
+        mock_fta_instance.rsi = 40
+        mock_fta_instance.fundamental_analysis_score = 30
+        mock_fta_instance.avg_gain_loss = 10
+        mock_fta_instance.five_year_avg_dividend_yield = 1
+
+        # Select existing stocks
+        selected_stocks = Stock.objects.filter(stock_code__in=['AAPL', 'GOOG'])
+
+        # Mock admin request and queryset
+        request = self.client.request().wsgi_request
+        request.user = self.admin_user
+        queryset = selected_stocks
+
+        # Call the command through the admin interface
+        Command().handle(queryset=queryset)
+
+        # Assert that the selected stocks have been populated
+        # with the correct data
+        for stock in selected_stocks:
+            stock.refresh_from_db()
+            self.assertEqual(stock.rsi, 40)
+            self.assertEqual(stock.fa_score, 30)
+            self.assertEqual(stock.description, 'company description')
+            self.assertEqual(stock.sector, 'sector')
+            self.assertEqual(stock.industry, 'industry')
+            self.assertEqual(stock.country, 'US')
+            self.assertEqual(stock.exchange_short_name, 'exc')
+            self.assertEqual(stock.company_name, 'company name')
+            self.assertEqual(stock.ipo_years, 10)
+            self.assertEqual(stock.avg_gain_loss, 10)
+            self.assertEqual(stock.five_year_avg_dividend_yield, 1)
+
+        # Confirm that the unselected stocks have no added data
+        unselected_stocks = Stock.objects.filter(stock_code__in=['MSFT'])
+        for stock in unselected_stocks:
+            stock.refresh_from_db()
+            self.assertEqual(stock.rsi, None)
+            self.assertEqual(stock.fa_score, None)
+            self.assertEqual(stock.description, None)
+            self.assertEqual(stock.sector, None)
+            self.assertEqual(stock.industry, None)
+            self.assertEqual(stock.country, None)
+            self.assertEqual(stock.exchange_short_name, None)
+            self.assertEqual(stock.company_name, None)
+            self.assertEqual(stock.ipo_years, None)
+            self.assertEqual(stock.avg_gain_loss, None)
+            self.assertEqual(stock.five_year_avg_dividend_yield, None)

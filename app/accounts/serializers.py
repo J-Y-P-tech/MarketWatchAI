@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         """
-        Here e tell Django what should be passed to Serializer
+        Here we tell Django what should be passed to Serializer
         """
         model = User
         # The only fields that we allow user to change
