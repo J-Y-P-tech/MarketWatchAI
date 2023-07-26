@@ -2,48 +2,52 @@
 {% load static %}
 {% block content %}
 
-    <!-- Hero Section -->
-    <section class="hero" style="background-image: url('{% static 'img/plant-growing-from-jar-coins-with-copy-space.jpg' %}')">
-        <div class="container">
-            <h1 class="display-4">Welcome to MarketWatchAI!</h1>
-            <p class="lead text-white">Analyze stocks and get suggestions for long-term investment.</p>
-            <a class="btn btn-primary" href="#" role="button">Learn More</a>
-        </div>
-    </section>
+<!-- Hero Section -->
+<section class="hero"
+         style="background-image: url('{% static 'img/plant-growing-from-jar-coins-with-copy-space.jpg' %}')">
+    <div class="container">
+        <h1 class="display-4">Welcome to MarketWatchAI!</h1>
+        <p class="lead text-white">Analyze stocks and get suggestions for long-term investment.</p>
+        <a class="btn btn-primary" href="#" role="button">Learn More</a>
+    </div>
+</section>
 
-    <!-- Features Section -->
-    <section class="bg-light py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="card mb-4 mb-lg-0">
+<!-- Features Section -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <a href="{% url 'dashboard' %}" class="text-decoration-none">
+                    <div class="card mb-4 mb-lg-0" style="height: 300px;">
                         <div class="card-body text-center">
                             <i class="bi bi-graph-up display-4 text-primary"></i>
-                            <h2 class="h4 mt-4">Real-time Data</h2>
-                            <p>Access up-to-date stock market data for accurate analysis and decision-making.</p>
+                            <h2 class="h4 mt-3 mb-2">Investment opportunities</h2>
+                            <p>Find out which stocks have the highest potential for growth and income with our comprehensive and updated metrics.</p>
                         </div>
                     </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="card mb-4 mb-lg-0">
-                        <div class="card-body text-center">
-                            <i class="bi bi-bar-chart display-4 text-primary"></i>
-                            <h2 class="h4 mt-4">Advanced Analytics</h2>
-                            <p>Utilize powerful analytical tools to identify trends and make informed investment choices.</p>
-                        </div>
+                </a>
+            </div>
+            <div class="col-lg-4">
+                <div class="card mb-4 mb-lg-0" style="height: 300px;">
+                    <div class="card-body text-center">
+                        <i class="bi bi-bar-chart display-4 text-primary"></i>
+                        <h2 class="h4 mt-4">Advanced Analytics</h2>
+                        <p>Utilize powerful analytical tools to identify trends and make informed investment
+                            choices.</p>
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="card mb-4 mb-lg-0">
-                        <div class="card-body text-center">
-                            <i class="bi bi-wallet2 display-4 text-primary"></i>
-                            <h2 class="h4 mt-4">Portfolio Management</h2>
-                            <p>Track your investments, monitor performance, and optimize your portfolio effortlessly.</p>
-                        </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card mb-4 mb-lg-0" style="height: 300px;">
+                    <div class="card-body text-center">
+                        <i class="bi bi-wallet2 display-4 text-primary"></i>
+                        <h2 class="h4 mt-4">Portfolio Management</h2>
+                        <p>Track your investments, monitor performance, and optimize your portfolio effortlessly.</p>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
 {% endblock %}

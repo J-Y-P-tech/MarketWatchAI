@@ -45,7 +45,7 @@ class TestAccountPages(TestCase):
 
 class TestLogin(TestCase):
     """
-    Test that login page works as expected
+    Test that login page works as expectedF
     """
 
     def setUp(self):

@@ -33,15 +33,16 @@ class Command(BaseCommand):
         # Get the queryset from the options dictionary
         queryset = options.get('queryset')
         # Loop over the selected objects
-        for stock in queryset:
-            # Get the stock code from the object
-            stock_code = stock.stock_code
-            pus = PopulateUpdateStock(stock_code=stock_code)
-            pus.populate_company_info(update=False)
-            pus.populate_fundamental_analysis_score(update=True)
-            pus.populate_rsi(update=True)
-            pus.populate_avg_gain_loss(update=True)
-            pus.populate_five_year_avg_dividend_yield(update=True)
+        if queryset:
+            for stock in queryset:
+                # Get the stock code from the object
+                stock_code = stock.stock_code
+                pus = PopulateUpdateStock(stock_code=stock_code)
+                pus.populate_company_info(update=False)
+                pus.populate_fundamental_analysis_score(update=True)
+                pus.populate_rsi(update=True)
+                pus.populate_avg_gain_loss(update=True)
+                pus.populate_five_year_avg_dividend_yield(update=True)
 
         gsc = GetStockCodes(txt_file='all_stock_codes.txt')
         gsc.get_stock_codes_from_txt()

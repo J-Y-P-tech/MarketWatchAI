@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Stock
+from .models import Stock, UserProfile
 from .management.commands.populate_model_stock import Command
 
 
@@ -50,4 +50,9 @@ class StockAdmin(admin.ModelAdmin):
         Command().handle(queryset=queryset)
 
 
+class UserProfileAdmin(admin.ModelAdmin):
+    model = UserProfile
+
+
 admin.site.register(Stock, StockAdmin)
+admin.site.register(UserProfile, UserProfileAdmin)

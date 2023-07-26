@@ -1,15 +1,26 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from core.models import Stock
+from core.models import Stock, UserProfile
 import decimal
-from rest_framework import viewsets
+from rest_framework import viewsets, response, status
 from .serializers import StockSerializer
 from rest_framework.exceptions import ParseError
 from rest_framework.permissions import IsAuthenticated
 
 
 def home(request):
-    return render(request, 'pages/home.html')
+    user = request.user
+    if user.is_authenticated:
+        profile = UserProfile.objects.get(user=user.id)
+        context = {
+            'user': user,
+            'photo': profile.image
+        }
+    else:
+        context = {
+
+        }
+    return render(request, 'pages/home.html', context)
 
 
 @login_required(login_url='/accounts/login')
@@ -169,3 +180,26 @@ class StockListAPIView(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(five_year_avg_dividend_yield__gt=float(five_year_avg_dividend_yield))
 
         return queryset
+
+
+class StockDetailViewSet(viewsets.ViewSet):
+    """
+    ViewSet for stocks. Retrieves data for given stock by its ID.
+    If stock is not found ParseError is raised
+    """
+    queryset = Stock.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def retrieve(self, request, pk=None):
+        """
+        Override the retrieve method.
+        request is argument might see that is not used but without it
+        the API returns html, not JSON.
+        """
+        try:
+            stock = self.queryset.get(pk=pk)
+        except Stock.DoesNotExist:
+            return response.Response({"error": "Stock not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = StockSerializer(stock)
+        return response.Response(serializer.data)
