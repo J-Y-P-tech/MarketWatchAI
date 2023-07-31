@@ -9,6 +9,8 @@ router.register(r'stock', views.StockDetailViewSet, basename='stock')
 urlpatterns = [
     path('', views.home, name='home'),
     path('dashboard', views.dashboard, name='dashboard'),
-    path('<int:id>', views.detail, name='detail'),
+    path('stock/<int:id>', views.detail, name='detail'),
     path('', include(router.urls)),
+    path('profile-update', views.profile_update, name='profile-update'),
+    path('profile', views.profile, name='profile'),
 ]

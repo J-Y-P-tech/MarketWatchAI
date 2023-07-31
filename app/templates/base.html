@@ -31,16 +31,16 @@
                 <button class="btn btn-link dropdown-toggle text-white fs-6"
                         type="button" id="userMenu"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                    {% if photo %}
-                    <img src="{{ photo.url }}" alt=""
-                         class="rounded-circle" style="width: 48px; height: 48px;">
+                    {% if user_profile.image %}
+                    <img src="{{ user_profile.image.url }}" alt=""
+                         class="rounded-circle" style="width: 45px; height: 45px;">
                     {% else %}
                     <i class="bi bi-person-bounding-box fs-2"></i>
                     {% endif %}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
                     <li>
-                        <a class="dropdown-item" href="#">Profile</a>
+                        <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
                     </li>
                     <li>
                         <form method="post" action="{% url 'logout' %}">

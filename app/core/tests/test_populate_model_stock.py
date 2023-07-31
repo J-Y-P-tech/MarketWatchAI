@@ -639,7 +639,7 @@ class TestPopulateUpdateStock(TestCase):
         # Get data from model Stock
         stock = Stock.objects.get(stock_code='TXG')
         # Confirm that five_year_avg_dividend_yield is None
-        self.assertEqual(stock.five_year_avg_dividend_yield, None)
+        self.assertEqual(stock.five_year_avg_dividend_yield, -1)
 
         # Get the printed output from the buffer
         output = new_stdout.getvalue()
@@ -727,4 +727,4 @@ class TestAdminUpdateStocks(TestCase):
             self.assertEqual(stock.company_name, None)
             self.assertEqual(stock.ipo_years, None)
             self.assertEqual(stock.avg_gain_loss, None)
-            self.assertEqual(stock.five_year_avg_dividend_yield, None)
+            self.assertEqual(stock.five_year_avg_dividend_yield, -1)

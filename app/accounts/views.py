@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.contrib import messages, auth
 from django.contrib.auth.models import User
 from django.contrib.auth.models import BaseUserManager
-from rest_framework import generics
 from .serializers import UserSerializer, AuthTokenSerializer
 from rest_framework.response import Response
 from rest_framework import status, generics, authentication, permissions

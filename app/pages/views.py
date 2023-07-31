@@ -1,20 +1,26 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from core.models import Stock, UserProfile
+from django.contrib.auth.models import User
 import decimal
 from rest_framework import viewsets, response, status
 from .serializers import StockSerializer
 from rest_framework.exceptions import ParseError
 from rest_framework.permissions import IsAuthenticated
+import PIL.Image
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from io import BytesIO
+from django.contrib import messages
+import os.path
 
 
 def home(request):
     user = request.user
     if user.is_authenticated:
-        profile = UserProfile.objects.get(user=user.id)
+        user_profile = UserProfile.objects.get(user=user.id)
         context = {
             'user': user,
-            'photo': profile.image
+            'user_profile': user_profile
         }
     else:
         context = {
@@ -127,6 +133,136 @@ def dashboard(request):
         }
 
         return render(request, 'pages/dashboard.html', data)
+
+
+@login_required(login_url='/accounts/login')
+def profile(request):
+    if request.method == 'GET':
+        user = request.user
+        if user.is_authenticated:
+            user_profile = UserProfile.objects.get(user=user.id)
+            context = {
+                'user': user,
+                'user_profile': user_profile
+            }
+        else:
+            context = {
+
+            }
+        return render(request, 'pages/profile.html', context)
+
+
+@login_required(login_url='/accounts/login')
+def profile_update(request):
+    """
+    View that will manage profile page.
+    """
+    if request.method == 'GET':
+        user = request.user
+        if user.is_authenticated:
+            user_profile = UserProfile.objects.get(user=user.id)
+            context = {
+                'user': user,
+                'user_profile': user_profile
+            }
+        else:
+            context = {
+
+            }
+        return render(request, 'pages/profile_update.html', context)
+
+    if request.method == 'POST':
+
+        user = User.objects.get(id=request.user.id)
+        user_profile = UserProfile.objects.get(user=user.id)
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        bio = request.POST.get('bio')
+
+        if bio:
+            user_profile.bio = bio
+        birth_date = request.POST.get('birth_date')
+        if birth_date:
+            user_profile.birth_date = birth_date
+        location = request.POST.get('location')
+        if location:
+            user_profile.location = location
+
+        request_image = request.FILES.get('image')
+        if request_image:
+
+            image = PIL.Image.open(request_image)
+            if image.width < 200:
+                messages.error(request, 'Image should be at least 200x200 px.')
+                return redirect('profile-update')
+            else:
+                if image.height > image.width:
+                    """
+                    Image is portrait
+                    """
+                    updated_width = 200
+                    updated_height = int((200 * image.height) / image.width)
+                    image = image.resize((updated_width, updated_height), PIL.Image.ANTIALIAS)
+
+                    crop_left = 0
+                    crop_top = int((updated_height - updated_width) / 2)
+                    crop_right = updated_width
+                    crop_bottom = updated_width + crop_top
+
+                    # left, top, right, bottom
+                    resized_image = image.crop((crop_left, crop_top, crop_right, crop_bottom))
+                else:
+                    """
+                    Image is landscape
+                    """
+                    updated_height = 200
+                    updated_width = int((updated_height * image.width) / image.height)
+                    image = image.resize((updated_width, updated_height), PIL.Image.ANTIALIAS)
+
+                    crop_left = int((updated_width - updated_height) / 2)
+                    crop_top = 0
+                    crop_right = crop_left + updated_height
+                    crop_bottom = updated_height
+                    # left, top, right, bottom
+                    resized_image = image.crop((crop_left, crop_top, crop_right, crop_bottom))
+
+                # image.save(f'{settings.MEDIA_ROOT}/profile_images/{image.name}')
+                # Create a BytesIO buffer to temporarily hold the resized image data
+                buffer = BytesIO()
+
+                # Save the resized image to the buffer in the same format as the uploaded image
+                resized_image.save(buffer, format='JPEG')
+
+                # Create an InMemoryUploadedFile from the buffer with the same name as the original
+                resized_image_file = InMemoryUploadedFile(
+                    buffer,
+                    None,  # field_name, not needed in this case
+                    request_image.name,  # the original image filename
+                    request_image.content_type,  # content type of the original image
+                    resized_image.tell(),  # size of the resized image in bytes
+                    None,  # charset, not needed in this case
+                )
+
+                # Remove previous image
+                img_path = user_profile.image.path
+                if os.path.exists(img_path):
+                    os.remove(img_path)
+
+                user_profile.image = resized_image_file
+                # Save resized image
+                user_profile.save()
+                # Close Buffer
+                buffer.close()
+
+        user.save()
+        user_profile.save()
+
+        context = {
+            'user': user,
+            'user_profile': user_profile
+        }
+
+        return render(request, 'pages/profile.html', context)
 
 
 @login_required(login_url='/accounts/login')

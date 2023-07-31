@@ -38,7 +38,7 @@ class StockAdmin(admin.ModelAdmin):
         'fa_score',
         'avg_gain_loss'
     )
-    readonly_fields = ('rsi_date', 'fa_score_date', 'avg_gain_loss', 'five_year_avg_dividend_yield')
+    readonly_fields = ('rsi_date', 'fa_score_date')
     fields = (
         'stock_code', 'company_name', 'sector', 'industry', 'country', 'exchange_short_name',
         'ipo_years', 'rsi', 'rsi_date', 'fa_score', 'fa_score_date',

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %} | Profile Update {% endblock %}
+
+{% block content %}
+{% load static %}
+
+
+<!-- Profile Update -->
+<section class="login-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="login-card">
+                    <div class="login-header">
+                        <h3>Update yor profile</h3>
+                    </div>
+                    <form action="{% url 'profile-update' %}" method="POST"
+                          enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            {% if user.first_name %}
+                            <input type="text" name="first_name" class="form-control"
+                                   placeholder="{{ user.first_name }}" required>
+                            {% else %}
+                            <input type="text" name="first_name" class="form-control"
+                                   placeholder="First Name" required>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            {% if user.last_name %}
+                            <input type="text" name="last_name" class="form-control"
+                                   placeholder="{{ user.last_name }}" required>
+                            {% else %}
+                            <input type="text" name="last_name" class="form-control"
+                                   placeholder="Last Name" required>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            {% if user_profile.bio %}
+                            <textarea name="bio" class="form-control"
+                                      placeholder="{{ user_profile.bio }}"></textarea>
+                            {% else %}
+                            <textarea name="bio" class="form-control"
+                                      placeholder="Add bio"></textarea>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <input type="date" name="birth_date" class="form-control"
+                                   placeholder="Add birth date">
+                        </div>
+                        <div class="form-group">
+                            {% if user_profile.location %}
+                            <input type="text" name="location" class="form-control"
+                                   placeholder="{{ user_profile.location }}">
+                            {% else %}
+                            <input type="text" name="location" class="form-control"
+                                   placeholder="Add your location">
+                            {% endif %}
+                        </div>
+                        {% include 'includes/messages.html' %}
+                         <div class="form-group">
+                            <input type="file" name="image" class="form-control" id="image">
+                        </div>
+
+                        <div class="form-group text-center">
+                            <button type="submit" class="btn btn-primary btn-block px-5 mt-2">
+                                Update
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}

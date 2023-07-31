@@ -43,11 +43,12 @@
                 <label for="five_year_avg_dividend_yield" class="col-form-label text-center">
                     minimum <strong>5 Year Avg Dividend Yield:</strong>
                 </label>
-                <output id="five_year_avg_dividend_yield-value" class="range-value">{{ five_year_avg_dividend_yield }}
+                <output id="five_year_avg_dividend_yield-value"
+                        class="range-value">{{ five_year_avg_dividend_yield }}
                 </output>
                 <input type="range" class="form-range" id="five_year_avg_dividend_yield"
                        name="five_year_avg_dividend_yield"
-                       min="0" max="10" value="{{ five_year_avg_dividend_yield }}"
+                       min="-2" max="10" value="{{ five_year_avg_dividend_yield }}"
                        oninput="document.getElementById('five_year_avg_dividend_yield-value').innerHTML = this.value;">
 
             </div>

@@ -253,7 +253,7 @@ class TestDashboardFilter(TestCase):
         soup = BeautifulSoup(response.content, "html.parser")
         links = soup.find_all("a", style="text-decoration:none;color:black;")
 
-        self.assertEqual(links[0]["href"], '/' + str(self.stock.id))
+        self.assertEqual(links[0]["href"], '/stock/' + str(self.stock.id))
 
 
 class TestDashboardSort(TestCase):
