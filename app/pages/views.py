@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from core.models import Stock, UserProfile
 from django.contrib.auth.models import User
 import decimal
-from rest_framework import viewsets, response, status
+from rest_framework import viewsets, response, status, generics
 from .serializers import StockSerializer
 from rest_framework.exceptions import ParseError
 from rest_framework.permissions import IsAuthenticated
@@ -339,3 +339,25 @@ class StockDetailViewSet(viewsets.ViewSet):
 
         serializer = StockSerializer(stock)
         return response.Response(serializer.data)
+
+
+# class UserProfileViewSet(viewsets.ViewSet):
+#     """
+#     ViewSet for UserProfiles. Gets data for given user.
+#     If user is not found Parse error is raised.
+#     """
+#     queryset = UserProfile.objects.all()
+#     permission_classes = [IsAuthenticated]
+#
+#     def retrieve(self, request, pk=None):
+#         """
+#         Override the retrieve method.
+#         """
+#         try:
+#             user = request.user
+#             user_profile = self.queryset.get(pk=user.pk)
+#         except UserProfile.DoesNotExist:
+#             return response.Response({"error": "User profile not found."}, status=status.HTTP_404_NOT_FOUND)
+#
+#         serializer = UserProfileSerializer(user_profile)
+#         return response.Response(serializer.data)

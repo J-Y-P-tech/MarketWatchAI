@@ -5,6 +5,10 @@ from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 from rest_framework import status
 from django.contrib.auth.models import User
+from core.models import UserProfile
+from io import BytesIO
+from PIL import Image
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 class PublicUserApiTests(APITestCase):
@@ -183,3 +187,140 @@ class PrivateUserApiTests(APITestCase):
         self.assertEqual(self.user.first_name, payload['first_name'])
         self.assertTrue(self.user.check_password(payload['password']))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+
+class PrivateUserProfileApiTests(APITestCase):
+    """
+    Test User Profile API. Confirm that only authenticated user's data is returned
+    and in case of unauthorized user and exception is thrown.
+    """
+
+    def setUp(self):
+        """
+        SetUp method will create User and force API client to log in.
+        Tests will be performed with authenticated user.
+        """
+        # Create user in User model
+        self.user = User.objects.create_user(first_name="Test First Name",
+                                             last_name="Test Last Name",
+                                             email='test_existing@example.com',
+                                             username='test_existing@example.com',
+                                             password='test_password')
+        # Get created UserProfile
+        self.user_profile = UserProfile.objects.get(user=self.user)
+        self.user_profile.bio = 'Test Bio'
+        self.user_profile.birth_date = '1980-03-14'
+        self.user_profile.location = 'Sofia'
+        # Save the changes to the database
+        self.user_profile.save()
+
+        self.client = APIClient()
+        # Any requests that we will use for this client will be
+        # made using this user
+        self.client.force_authenticate(user=self.user)
+
+    def test_retrieve_user_profile(self):
+        """
+        Test that API can retrieve data for currently logged user.
+        """
+        response = self.client.get(reverse('api-user-profile'))
+
+        # Confirm that response is 200 = success
+        self.assertEqual(response.status_code, 200)
+
+        # Assert UserProfile data
+        self.assertEqual(response.data['bio'], 'Test Bio')
+        self.assertEqual(response.data['birth_date'], '1980-03-14')
+        self.assertEqual(response.data['location'], 'Sofia')
+
+        # Assert User data
+        self.assertEqual(response.data['first_name'], 'Test First Name')
+        self.assertEqual(response.data['last_name'], 'Test Last Name')
+        self.assertEqual(response.data['email'], 'test_existing@example.com')
+        self.assertEqual(response.data['username'], 'test_existing@example.com')
+
+    def test_update_user_profile_successfully(self):
+        """
+        Test that API updated user data successfully.
+        """
+        updated_data = {
+            'bio': 'Updated Bio',
+            'birth_date': '1990-05-25',
+            'location': 'New York',
+        }
+        response = self.client.patch(reverse('api-user-profile'), data=updated_data)
+
+        # Confirm that response is 200 = success
+        self.assertEqual(response.status_code, 200)
+
+        # Refresh the user profile from the database
+        self.user_profile.refresh_from_db()
+
+        # Assert updated UserProfile data
+        self.assertEqual(self.user_profile.bio, 'Updated Bio')
+        self.assertEqual(str(self.user_profile.birth_date), '1990-05-25')
+        self.assertEqual(self.user_profile.location, 'New York')
+
+    def test_upload_image_user_profile_successfully(self):
+        """
+        Generate image 200x200 px that use API to upload it.
+        """
+
+        # Create a 200x200px image file
+        image_file = BytesIO()
+        image = Image.new('RGB', size=(200, 200), color=(155, 0, 0))
+        image.save(image_file, 'JPEG')
+        image_file.name = 'upload_image.jpg'
+        image_file.seek(0)
+
+        # Upload the image via the API
+        image_data = {
+            'image': SimpleUploadedFile(image_file.name, image_file.read(), content_type='image/jpeg')
+        }
+        response = self.client.patch(reverse('api-user-profile'), data=image_data, format='multipart')
+
+        # Confirm that response is 200 = success
+        self.assertEqual(response.status_code, 200)
+
+        # Refresh the user profile from the database
+        self.user_profile.refresh_from_db()
+
+        # Assert that the path to the uploaded image exists in UserProfile
+        self.assertIn('upload_image.jpg', str(self.user_profile.image))
+
+        # Delete the uploaded image from the user profile
+        self.user_profile.image.delete()
+
+        # Clean up
+        image_file.close()
+
+    def test_upload_image_profile_error(self):
+        """
+        Test unsuccessful image upload. Generate image less than 200px wide and
+        confirm that exception is raised: Image should be at least 200x200 px.
+        """
+
+        # Create a 1x1px image file
+        image_file = BytesIO()
+        image = Image.new('RGB', size=(1, 1), color=(155, 0, 0))
+        image.save(image_file, 'JPEG')
+        image_file.name = 'error_image.jpg'
+        image_file.seek(0)
+
+        # Upload the small image via the API and expect a ValidationError
+        with self.assertRaises(Exception) as context:
+            self.client.patch(reverse('api-user-profile'),
+                              {'image': image_file},
+                              format='multipart')
+
+        # Confirm that the exception is raised and contains the expected error message
+        self.assertEqual(str(context.exception), 'Image should be at least 200x200 px.')
+
+        # Refresh the user profile from the database
+        self.user_profile.refresh_from_db()
+
+        # Assert that there is no path to uploaded image in UserProfile
+        self.assertNotIn('error_image.jpg', str(self.user_profile.image))
+
+        # Clean up
+        image_file.close()

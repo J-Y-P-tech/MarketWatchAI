@@ -7,6 +7,9 @@ from rest_framework.response import Response
 from rest_framework import status, generics, authentication, permissions
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
+from core.models import UserProfile
+from .serializers import UserProfileSerializer
+from django.http import Http404
 
 
 def login(request):
@@ -117,3 +120,34 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         """Retrieve and return the authenticated user."""
         return self.request.user
+
+
+class UserProfileRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
+    """
+    Retrieve or update a UserProfile instance.
+    RetrieveUpdateAPIView automatically generates both POST and PUT methods
+    because it's designed to handle both creating a new resource (with POST)
+    and updating an existing resource (with PUT).
+    """
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        try:
+            user = self.request.user
+            obj = self.queryset.get(pk=user.pk)
+            return obj
+        except UserProfile.DoesNotExist:
+            raise Http404("User profile not found")
+
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            serializer = self.serializer_class(instance=self.get_object(),
+                                               data=request.data,
+                                               context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
