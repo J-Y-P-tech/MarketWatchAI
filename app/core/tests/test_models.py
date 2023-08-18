@@ -1,10 +1,13 @@
 from django.test import TestCase, Client
-from core.models import Stock, UserProfile
+from core.models import Stock, UserProfile, File
 from django.utils import timezone
 from django.contrib.auth.models import User
 from io import BytesIO
 from PIL import Image
 from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.urls import reverse
+import os
 
 
 class StockModelTest(TestCase):
@@ -100,3 +103,145 @@ class UserProfileModelTest(TestCase):
 
         # Delete the image file on teardown
         user_profile.image.delete(save=True)
+
+
+class FileModelTests(TestCase):
+    """
+    Tests for FileModel
+    """
+
+    def setUp(self):
+        """
+        SetUp method creates instance of Client()
+        Creates superuser in User Model and force to log in
+        """
+        self.client = Client()
+        self.admin_username = 'super_user_profile@example.com'
+        self.admin_password = 'adminpassword'
+
+        self.user = User.objects.create_superuser(username=self.admin_username,
+                                                  password=self.admin_password,
+                                                  email=self.admin_username)
+        self.client.login(username=self.admin_username, password=self.admin_password)
+
+
+class FileAdminTestCase(TestCase):
+    """
+    Test class for model File
+    """
+
+    def setUp(self):
+        """
+        Create admin and regular user for tests and login as admin.
+        """
+        self.admin_user = User.objects.create_user(
+            username='admin',
+            password='adminpassword',
+            is_staff=True,
+        )
+        self.user = User.objects.create_user(
+            username='regular_user',
+            password='regularpassword',
+            is_staff=False,
+        )
+        self.client.login(username='admin', password='adminpassword')
+        self.upload_url = reverse('admin:core_file_add')
+        file_data = b"AAPL\nMSFT\nADBE"
+        self.file_to_upload = SimpleUploadedFile("test_file.txt", file_data)
+
+    def tearDown(self):
+        """
+        Clean up uploaded files and Stock objects.
+        """
+        for file_obj in File.objects.all():
+            # Delete the associated file from the Docker volume
+            file_path = file_obj.file.path
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+            # Delete the model record
+            file_obj.delete()
+
+        Stock.objects.all().delete()
+
+    def test_admin_can_upload_file(self):
+        """
+        Test that admin can upload txt file successfully.
+        Confirm that record in model File is created.
+        Confirm that stock codes from file are added to model Stock.
+        """
+
+        # Confirm that admin has access to: admin/core/file/add/
+        response = self.client.get(self.upload_url)
+        self.assertEqual(response.status_code, 200)
+
+        # Upload generated txt file
+        response = self.client.post(self.upload_url, {'file': self.file_to_upload})
+
+        # Redirect after successful upload
+        self.assertEqual(response.status_code, 302)
+
+        # Confirm that file is added to model File
+        self.assertEqual(File.objects.count(), 1)
+
+        # Confirm that file exists on its location
+        file_obj = File.objects.first()
+        self.assertTrue(os.path.exists(file_obj.file.path))
+
+        # Confirm that model Stock contains: AAPL, MSFT, ADBE
+        stock_codes = ['AAPL', 'MSFT', 'ADBE']
+        for stock_code in stock_codes:
+            self.assertTrue(Stock.objects.filter(stock_code=stock_code).exists())
+
+    def test_existing_stocks_not_added_from_file(self):
+        """
+        Confirm that stock that already exist in file are not been added twice
+        """
+
+        # Upload generated txt file from setUp
+        self.client.post(self.upload_url, {'file': self.file_to_upload})
+
+        # generate new file with 1 new stock
+        file_data = b"AAPL\nMSFT\nADBE\nERIC"
+        file_to_upload = SimpleUploadedFile("test_file.txt", file_data)
+        self.client.post(self.upload_url, {'file': file_to_upload})
+
+        # Confirm that number of stocks is = 4
+        # Only 1 new stock is added to existing 3
+        count_stocks = Stock.objects.all().count()
+        self.assertEqual(count_stocks, 4)
+
+    def test_admin_can_delete_file(self):
+        """
+        Confirm that admin can upload and delete file
+        """
+        # Upload generated txt file
+        self.client.post(self.upload_url, {'file': self.file_to_upload})
+
+        # Delete uploaded file using: admin/core/file/delete/
+        file_obj = File.objects.first()
+        delete_url = reverse('admin:core_file_delete', args=[file_obj.pk])
+
+        # Confirm deletion
+        response = self.client.post(delete_url, {'post': 'yes'})
+
+        # Redirect after successful delete
+        self.assertEqual(response.status_code, 302)
+
+        # Confirm that no records exist in model File
+        self.assertEqual(File.objects.count(), 0)
+
+    def test_regular_user_cannot_upload_file(self):
+        """
+        Confirm that regular user can not upload in model File
+        due to restrictions.
+        """
+        # Log in as regular user
+        self.client.logout()
+        self.client.login(username='regular_user', password='regularpassword')
+
+        response = self.client.get(self.upload_url)
+
+        # 302 - Redirect
+        # User is redirected to login page
+        self.assertEqual(response.status_code, 302)

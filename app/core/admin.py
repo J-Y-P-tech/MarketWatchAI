@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Stock, UserProfile
+from .models import Stock, UserProfile, File
 from .management.commands.populate_model_stock import Command
+import os
 
 
 class StockAdmin(admin.ModelAdmin):
@@ -49,10 +50,27 @@ class StockAdmin(admin.ModelAdmin):
         # Call the command logic here
         Command().handle(queryset=queryset)
 
+    populate_model_stock.short_description = "Update Model Stock Data from API"
+
 
 class UserProfileAdmin(admin.ModelAdmin):
     model = UserProfile
 
 
+class FileAdmin(admin.ModelAdmin):
+    model = File
+
+    def delete_queryset(self, request, queryset):
+        for file_obj in queryset:
+            # Delete the associated file from the Docker volume
+            file_path = file_obj.file.path
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+            # Delete the model record
+            file_obj.delete()
+
+
 admin.site.register(Stock, StockAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)
+admin.site.register(File, FileAdmin)
